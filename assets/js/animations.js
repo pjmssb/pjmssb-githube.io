@@ -467,6 +467,104 @@ function registerAnimations() {
             });
         };
     });
+
+    // Add new N-body gravitational simulation
+    backgroundAnimations.push(function gravityBalls(canvas, ctx) {
+        const G = 0.75; // Gravitational constant
+        const balls = [];
+        const numBalls = 6;
+        const mass = 100;
+        const radius = 8;
+        const repulsionDistance = radius * 1.5; // Distance threshold for repulsion
+        const repulsionStrength = 2; // Multiplier for repulsion force
+        const maxSpeed = 2; // Maximum initial speed
+        const minDistance = radius * 4; // Minimum distance between balls at start
+
+        // Initialize balls with random positions and velocities
+        for (let i = 0; i < numBalls; i++) {
+            let x = radius + (Math.random() * (canvas.width - 2 * radius));
+            let y = radius + (Math.random() * (canvas.height - 2 * radius));
+            
+            // Random angle for initial velocity
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * maxSpeed;
+
+            balls.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                mass: mass,
+                radius: radius
+            });
+        }
+
+        return function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const animationElement = getComputedStyle(document.documentElement)
+                .getPropertyValue('--animation-element').trim();
+
+            // Update velocities based on gravitational forces
+            for (let i = 0; i < balls.length; i++) {
+                const ball1 = balls[i];
+                let fx = 0;
+                let fy = 0;
+
+                for (let j = 0; j < balls.length; j++) {
+                    if (i !== j) {
+                        const ball2 = balls[j];
+                        const dx = ball2.x - ball1.x;
+                        const dy = ball2.y - ball1.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance > 0) {
+                            let force;
+                            if (distance < repulsionDistance) {
+                                // Repulsion force when balls are too close
+                                force = -50 * G * (ball1.mass * ball2.mass) / (distance * distance) * repulsionStrength;
+                            } else {
+                                // Normal gravitational attraction
+                                force = G * (ball1.mass * ball2.mass) / (distance * distance);
+                            }
+                            
+                            fx += force * dx / distance;
+                            fy += force * dy / distance;
+                        }
+                    }
+                }
+
+                // Update velocity (F = ma → a = F/m)
+                ball1.vx += fx / ball1.mass;
+                ball1.vy += fy / ball1.mass;
+
+                // Add friction to prevent excessive speeds
+                ball1.vx *= 0.995;
+                ball1.vy *= 0.995;
+            }
+
+            // Update positions and draw balls
+            balls.forEach(ball => {
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+
+                // Bounce off walls with energy loss
+                if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+                    ball.vx *= -0.8;
+                    ball.x = ball.x - ball.radius < 0 ? ball.radius : canvas.width - ball.radius;
+                }
+                if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+                    ball.vy *= -0.8;
+                    ball.y = ball.y - ball.radius < 0 ? ball.radius : canvas.height - ball.radius;
+                }
+
+                // Draw ball
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fillStyle = animationElement;
+                ctx.fill();
+            });
+        };
+    });
 }
 
 // Create and manage background animation
