@@ -470,13 +470,13 @@ function registerAnimations() {
 
     // Add new N-body gravitational simulation
     backgroundAnimations.push(function gravityBalls(canvas, ctx) {
-        const G = 0.75; // Gravitational constant
+        const G = 0.9; // Gravitational constant
         const balls = [];
-        const numBalls = 6;
+        const numBalls = 8;
         const mass = 100;
         const radius = 8;
         const repulsionDistance = radius * 1.5; // Distance threshold for repulsion
-        const repulsionStrength = 20; // Multiplier for repulsion force
+        const repulsionStrength = 10; // Multiplier for repulsion force
         const maxSpeed = 2; // Maximum initial speed
         const minDistance = radius * 4; // Minimum distance between balls at start
 
