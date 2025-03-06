@@ -476,7 +476,7 @@ function registerAnimations() {
         const mass = 100;
         const radius = 8;
         const repulsionDistance = radius * 1.5; // Distance threshold for repulsion
-        const repulsionStrength = 2; // Multiplier for repulsion force
+        const repulsionStrength = 20; // Multiplier for repulsion force
         const maxSpeed = 2; // Maximum initial speed
         const minDistance = radius * 4; // Minimum distance between balls at start
 
@@ -521,7 +521,7 @@ function registerAnimations() {
                             let force;
                             if (distance < repulsionDistance) {
                                 // Repulsion force when balls are too close
-                                force = -50 * G * (ball1.mass * ball2.mass) / (distance * distance) * repulsionStrength;
+                                force = -G * (ball1.mass * ball2.mass) / (distance * distance) * repulsionStrength;
                             } else {
                                 // Normal gravitational attraction
                                 force = G * (ball1.mass * ball2.mass) / (distance * distance);
